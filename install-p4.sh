@@ -12,6 +12,7 @@ fi
 sudo apt-get update
 
 # Clone the GitHub repo for the P4 compiler
+cd ~
 git clone --recursive https://github.com/p4lang/p4c.git
 
 # Install the dependencies
@@ -21,6 +22,7 @@ sudo apt-get install -y cmake g++ git automake libtool libgc-dev bison flex libf
                         texlive-full
 
 # Install protobuf 3.6.1 from source code
+cd ~
 git clone https://github.com/protocolbuffers/protobuf.git
 cd protobuf
 git checkout v3.6.1
@@ -44,7 +46,7 @@ make -j4 check
 sudo make install
 
 # Clone the P4 behavioral model model GitHub repo
-cd
+cd ~
 git clone https://github.com/p4lang/behavioral-model.git
 
 # Install the dependencies
@@ -59,4 +61,3 @@ make
 # Install the software switch
 sudo make install
 sudo ldconfig
-
