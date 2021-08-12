@@ -39,9 +39,9 @@ error {
 }
 
 parser my_parser(packet_in packet,
-                out headers_t hd,
-                inout metadata_t meta,
-                inout standard_metadata_t standard_meta)
+                 out headers_t hd,
+                 inout metadata_t meta,
+                 inout standard_metadata_t standard_meta)
 {
     state start {
         packet.extract(hd.ethernet);
@@ -60,7 +60,7 @@ parser my_parser(packet_in packet,
 }
 
 control my_deparser(packet_out packet,
-                   in headers_t hdr)
+                    in headers_t hdr)
 {
     apply {
         packet.emit(hdr.ethernet);
@@ -69,20 +69,20 @@ control my_deparser(packet_out packet,
 }
 
 control my_verify_checksum(inout headers_t hdr,
-                         inout metadata_t meta)
+                           inout metadata_t meta)
 {
     apply { }
 }
 
 control my_compute_checksum(inout headers_t hdr,
-                          inout metadata_t meta)
+                            inout metadata_t meta)
 {
     apply { }
 }
 
 control my_ingress(inout headers_t hdr,
-                  inout metadata_t meta,
-                  inout standard_metadata_t standard_metadata)
+                   inout metadata_t meta,
+                   inout standard_metadata_t standard_metadata)
 {
     bool dropped = false;
 
@@ -115,8 +115,8 @@ control my_ingress(inout headers_t hdr,
 }
 
 control my_egress(inout headers_t hdr,
-                 inout metadata_t meta,
-                 inout standard_metadata_t standard_metadata)
+                  inout metadata_t meta,
+                  inout standard_metadata_t standard_metadata)
 {
     apply { }
 }
