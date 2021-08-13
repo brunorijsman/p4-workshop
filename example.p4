@@ -47,7 +47,7 @@ parser my_parser(packet_in packet,
         packet.extract(hd.ethernet);
         transition select(hd.ethernet.ether_type) {
             0x0800:  parse_ipv4;
-            default: reject;
+            default: accept;
         }
     }
 
