@@ -146,7 +146,7 @@ control engress_deparser(
     apply { }
 }
 
-control egress_processing
+control egress_processing(
     inout headers_t headers,
     inout empty_metadata_t local_metadata,
     in psa_egress_input_metadata_t psa_egress_input_metadata,
