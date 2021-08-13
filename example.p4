@@ -30,7 +30,7 @@ struct headers_t {
     ipv4_t     ipv4;
 }
 
-struct metadata_t {
+struct empty_metadata_t {
 }
 
 error {
@@ -41,7 +41,7 @@ error {
 parser ipv4_parser(
     packet_in packet,
     out headers_t headers,
-    inout metadata_t metadata,
+    inout empty_metadata_t metadata,
     inout standard_metadata_t standard_metadata
 )
 {
@@ -72,18 +72,18 @@ control ipv4_deparser(
     }
 }
 
-control verify_checksum(
+control dummy_verify_checksum(
     inout headers_t headers,
-    inout metadata_t metadata
+    inout empty_metadata_t metadata
 )
 {
     // Not implemented
     apply { }
 }
 
-control compute_checksum(
+control dummy_compute_checksum(
     inout headers_t headers,
-    inout metadata_t metadata
+    inout empty_metadata_t metadata
 )
 {
     // Not implemented
@@ -92,7 +92,7 @@ control compute_checksum(
 
 control ingress_processing(
     inout headers_t headers,
-    inout metadata_t metadata,
+    inout empty_metadata_t metadata,
     inout standard_metadata_t standard_metadata
 )
 {
@@ -128,7 +128,7 @@ control ingress_processing(
 
 control egress_processing(
     inout headers_t headers,
-    inout metadata_t metadata,
+    inout empty_metadata_t metadata,
     inout standard_metadata_t standard_metadata
 )
 {
@@ -138,9 +138,9 @@ control egress_processing(
 
 V1Switch(
     ipv4_parser(),
-    verify_checksum(),
+    dummy_verify_checksum(),
     ingress_processing(),
     egress_processing(),
-    compute_checksum(),
+    dummy_compute_checksum(),
     ipv4_deparser()
 ) main;
