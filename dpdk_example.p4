@@ -1,5 +1,5 @@
 #include <core.p4>
-#include <v1model.p4>
+#include <psa.p4>
 
 typedef bit<48> EthernetAddress;
 typedef bit<32> IPv4Address;
@@ -38,10 +38,10 @@ error {
     IPv4OptionsNotSupported
 }
 
-parser my_parser(packet_in packet,
-                 out headers_t hd,
-                 inout metadata_t meta,
-                 inout standard_metadata_t standard_meta)
+parser ipv4_parser(packet_in packet,
+                   out headers_t hd,
+                   inout metadata_t meta,
+                   inout standard_metadata_t standard_meta)
 {
     state start {
         packet.extract(hd.ethernet);
@@ -59,8 +59,8 @@ parser my_parser(packet_in packet,
     }    
 }
 
-control my_deparser(packet_out packet,
-                    in headers_t hdr)
+control ipv4_deparser(packet_out packet,
+                      in headers_t hdr)
 {
     apply {
         packet.emit(hdr.ethernet);
@@ -68,21 +68,9 @@ control my_deparser(packet_out packet,
     }
 }
 
-control my_verify_checksum(inout headers_t hdr,
-                           inout metadata_t meta)
-{
-    apply { }
-}
-
-control my_compute_checksum(inout headers_t hdr,
-                            inout metadata_t meta)
-{
-    apply { }
-}
-
-control my_ingress(inout headers_t hdr,
-                   inout metadata_t meta,
-                   inout standard_metadata_t standard_metadata)
+control ingress(inout headers_t hdr,
+                inout metadata_t meta,
+                inout standard_metadata_t standard_metadata)
 {
     bool dropped = false;
 
@@ -114,16 +102,14 @@ control my_ingress(inout headers_t hdr,
     }
 }
 
-control my_egress(inout headers_t hdr,
-                  inout metadata_t meta,
-                  inout standard_metadata_t standard_metadata)
+control egress(inout headers_t hdr,
+               inout metadata_t meta,
+               inout standard_metadata_t standard_metadata)
 {
     apply { }
 }
 
-ebpfFilter(my_parser(),
-           my_verify_checksum(),
-           my_ingress(),
-           my_egress(),
-           my_compute_checksum(),
-           my_deparser()) main;
+PSA_Switch(IngressPipeline(ipv4_parser, ingress, ipv4_deparser),
+           PacketReplicationEngine(),
+           IngressPipeline(ipv4_parser, egress, ipv4_deparser),
+           BufferingQueueingEngine()) main;
