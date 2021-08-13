@@ -30,7 +30,7 @@ struct headers_t {
     ipv4_t     ipv4;
 }
 
-struct empty_metadata_t {
+struct metadata_t {
 }
 
 error {
