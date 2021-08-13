@@ -158,8 +158,8 @@ control egress_processing(
 }
 
 PSA_Switch(
-    IngressPipeline(ingress_parser, ingress_processing, ingress_deparser),
+    IngressPipeline(ingress_parser(), ingress_processing(), ingress_deparser()),
     PacketReplicationEngine(),
-    IngressPipeline(ingress_parser, egress_processing, ingress_deparser),
+    IngressPipeline(ingress_parser(), egress_processing(), ingress_deparser()),
     BufferingQueueingEngine()
 ) main;
