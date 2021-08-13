@@ -30,7 +30,7 @@ struct headers_t {
     ipv4_t     ipv4;
 }
 
-struct metadata_t {
+struct empty_metadata_t {
 }
 
 error {
@@ -38,51 +38,63 @@ error {
     IPv4OptionsNotSupported
 }
 
-parser my_parser(packet_in packet,
-                 out headers_t hd,
-                 inout metadata_t meta,
-                 inout standard_metadata_t standard_meta)
+parser ipv4_parser(
+    packet_in packet,
+    out headers_t headers,
+    inout empty_metadata_t metadata,
+    inout standard_metadata_t standard_metadata
+)
 {
     state start {
-        packet.extract(hd.ethernet);
-        transition select(hd.ethernet.ether_type) {
+        packet.extract(headers.ethernet);
+        transition select(headers.ethernet.ether_type) {
             0x0800:  parse_ipv4;
             default: accept;
         }
     }
 
     state parse_ipv4 {
-        packet.extract(hd.ipv4);
-        verify(hd.ipv4.version == 4w4, error.IPv4IncorrectVersion);
-        verify(hd.ipv4.ihl == 4w5, error.IPv4OptionsNotSupported);
+        packet.extract(headers.ipv4);
+        verify(headers.ipv4.version == 4w4, error.IPv4IncorrectVersion);
+        verify(headers.ipv4.ihl == 4w5, error.IPv4OptionsNotSupported);
         transition accept;
     }    
 }
 
-control my_deparser(packet_out packet,
-                    in headers_t hdr)
+control ipv4_deparser(
+    packet_out packet,
+    in headers_t headers
+)
 {
     apply {
-        packet.emit(hdr.ethernet);
-        packet.emit(hdr.ipv4);
+        packet.emit(headers.ethernet);
+        packet.emit(headers.ipv4);
     }
 }
 
-control my_verify_checksum(inout headers_t hdr,
-                           inout metadata_t meta)
+control verify_checksum(
+    inout headers_t headers,
+    inout empty_metadata_t metadata
+)
 {
+    // Not implemented
     apply { }
 }
 
-control my_compute_checksum(inout headers_t hdr,
-                            inout metadata_t meta)
+control compute_checksum(
+    inout headers_t headers,
+    inout empty_metadata_t metadata
+)
 {
+    // Not implemented
     apply { }
 }
 
-control my_ingress(inout headers_t hdr,
-                   inout metadata_t meta,
-                   inout standard_metadata_t standard_metadata)
+control ingress_processing(
+    inout headers_t headers,
+    inout empty_metadata_t metadata,
+    inout standard_metadata_t standard_metadata
+)
 {
     bool dropped = false;
 
@@ -92,13 +104,13 @@ control my_ingress(inout headers_t hdr,
     }
 
     action to_port_action(bit<9> port) {
-        hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
+        headers.ipv4.ttl = headers.ipv4.ttl - 1;
         standard_metadata.egress_spec = port;
     }
 
     table ipv4_match {
         key = {
-            hdr.ipv4.dst_addr: lpm;
+            headers.ipv4.dst_addr: lpm;
         }
         actions = {
             drop_action;
@@ -114,16 +126,21 @@ control my_ingress(inout headers_t hdr,
     }
 }
 
-control my_egress(inout headers_t hdr,
-                  inout metadata_t meta,
-                  inout standard_metadata_t standard_metadata)
+control egress_processing(
+    inout headers_t headers,
+    inout empty_metadata_t metadata,
+    inout standard_metadata_t standard_metadata
+)
 {
+    // Do nothing
     apply { }
 }
 
-V1Switch(my_parser(),
-         my_verify_checksum(),
-         my_ingress(),
-         my_egress(),
-         my_compute_checksum(),
-         my_deparser()) main;
+V1Switch(
+    ipv4_parser(),
+    verify_checksum(),
+    ingress_processing(),
+    egress_processing(),
+    compute_checksum(),
+    ipv4_deparser()
+) main;

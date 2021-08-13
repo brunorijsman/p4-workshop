@@ -30,7 +30,7 @@ struct headers_t {
     ipv4_t     ipv4;
 }
 
-struct metadata_t {
+struct empty_metadata_t {
 }
 
 error {
@@ -38,10 +38,14 @@ error {
     IPv4OptionsNotSupported
 }
 
-parser ipv4_parser(packet_in packet,
-                   out headers_t hd,
-                   inout metadata_t meta,
-                   inout standard_metadata_t standard_meta)
+parser ingress_parser(
+    packet_in packet,
+    out headers_t headers,
+    inout local_metadata_t local_metadata,
+    in psa_ingress_parser_input_metadata_t standard_metadata,
+    in empty_metadata_t resubmit_metadata,
+    in empty_metadata_t recirculate_metadata
+)
 {
     state start {
         packet.extract(hd.ethernet);
@@ -59,34 +63,45 @@ parser ipv4_parser(packet_in packet,
     }    
 }
 
-control ipv4_deparser(packet_out packet,
-                      in headers_t hdr)
+control ingress_deparser(
+    packet_out packet,
+    out empty_metadata_t clone_ingress_to_egress_metadata,
+    out empty_metadata_t resubmit_metadata,
+    out empty_metadata_t normal_metadata,
+    inout headers_t headers,
+    in local_metadata_t local_metadata,
+    in psa_ingress_output_metadata_t output_metadata
+)
 {
     apply {
-        packet.emit(hdr.ethernet);
-        packet.emit(hdr.ipv4);
+        packet.emit(headers.ethernet);
+        packet.emit(headers.ipv4);
     }
 }
 
-control ingress(inout headers_t hdr,
-                inout metadata_t meta,
-                inout standard_metadata_t standard_metadata)
+control ingress_processing(
+    inout headers_t headers,
+    inout local_metadata_t local_metadata,
+    in psa_ingress_input_metadata_t input_metadata,
+    inout psa_ingress_output_metadata_t output_metadata
+)
 {
     bool dropped = false;
 
     action drop_action() {
-        mark_to_drop(standard_metadata);
+        output_metadata.egress_port = (PortId_t)4;  // TODO: Use a constant
+        // mark_to_drop(standard_metadata);   TODO: Can we use this????
         dropped = true;
     }
 
     action to_port_action(bit<9> port) {
-        hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
+        headers.ipv4.ttl = headers.ipv4.ttl - 1;
         standard_metadata.egress_spec = port;
     }
 
     table ipv4_match {
         key = {
-            hdr.ipv4.dst_addr: lpm;
+            headers.ipv4.dst_addr: lpm;
         }
         actions = {
             drop_action;
@@ -102,14 +117,49 @@ control ingress(inout headers_t hdr,
     }
 }
 
-control egress(inout headers_t hdr,
-               inout metadata_t meta,
-               inout standard_metadata_t standard_metadata)
+parser engress_parser(
+    packet_in packet,
+    out headers_t headers,
+    inout local_metadata_t local_metadata,
+    in psa_egress_parser_input_metadata_t standard_metadata,
+    in empty_metadata_t metadata,
+    in empty_metadata_t clone_ingress_to_egress_metadata,
+    in empty_metadata_t clone_egress_to_egress_metadata
+)
 {
+    state start {
+        transition accept;
+    }
+}
+
+control engress_deparser(
+    packet_out packet,
+    out empty_metadata_t clone_egress_to_egress_metadata,
+    out empty_metadata_t recirculate_metadata,
+    inout headers_t headers,
+    in local_metadata_t local_metadata,
+    in psa_egress_output_metadata_t psa_egress_output_metadata,
+    in psa_egress_deparser_input_metadata_t psa_egress_deparser_input_metadata
+)
+{
+    // Do nothing
     apply { }
 }
 
-PSA_Switch(IngressPipeline(ipv4_parser, ingress, ipv4_deparser),
-           PacketReplicationEngine(),
-           IngressPipeline(ipv4_parser, egress, ipv4_deparser),
-           BufferingQueueingEngine()) main;
+control egress_processing
+    inout headers_t headers,
+    inout local_metadata_t local_metadata,
+    in psa_egress_input_metadata_t psa_egress_input_metadata,
+    inout psa_egress_output_metadata_t psa_egress_output_metadata
+)
+{
+    // Do nothing
+    apply { }
+}
+
+PSA_Switch(
+    IngressPipeline(ingress_parser, ingress_processing, ingress_deparser),
+    PacketReplicationEngine(),
+    IngressPipeline(ingress_parser, egress_processing, ingress_deparser),
+    BufferingQueueingEngine()
+) main;
