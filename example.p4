@@ -41,7 +41,7 @@ error {
 parser ipv4_parser(
     packet_in packet,
     out headers_t headers,
-    inout empty_metadata_t metadata,
+    inout metadata_t metadata,
     inout standard_metadata_t standard_metadata
 )
 {
@@ -83,7 +83,7 @@ control verify_checksum(
 
 control compute_checksum(
     inout headers_t headers,
-    inout empty_metadata_t metadata
+    inout metadata_t metadata
 )
 {
     // Not implemented
@@ -92,7 +92,7 @@ control compute_checksum(
 
 control ingress_processing(
     inout headers_t headers,
-    inout empty_metadata_t metadata,
+    inout metadata_t metadata,
     inout standard_metadata_t standard_metadata
 )
 {
@@ -128,7 +128,7 @@ control ingress_processing(
 
 control egress_processing(
     inout headers_t headers,
-    inout empty_metadata_t metadata,
+    inout metadata_t metadata,
     inout standard_metadata_t standard_metadata
 )
 {
