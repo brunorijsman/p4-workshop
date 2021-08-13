@@ -57,7 +57,7 @@ parser ingress_parser(
 
     state parse_ipv4 {
         packet.extract(headers.ipv4);
-        verify(headers.ipv4.version == 4w4, error.IPv4IncorrectVersion);
+        verify(headers.ipv4.version == 4, error.IPv4IncorrectVersion);
         verify(headers.ipv4.ihl == 4w5, error.IPv4OptionsNotSupported);
         transition accept;
     }    
