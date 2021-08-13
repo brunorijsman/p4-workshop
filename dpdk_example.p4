@@ -57,9 +57,12 @@ parser ingress_parser(
 
     state parse_ipv4 {
         packet.extract(headers.ipv4);
+        // For some weird reason, the DPDK target / PSA arch does not support doing a comparison
+        // inside a verify call.
         bool good_version = headers.ipv4.version == 4w4;
         verify(good_version, error.IPv4IncorrectVersion);
-        verify(headers.ipv4.ihl == 4w5, error.IPv4OptionsNotSupported);
+        bool good_ihl = headers.ipv4.ihl == 4w5;
+        verify(good_ihl, error.IPv4OptionsNotSupported);
         transition accept;
     }    
 }
