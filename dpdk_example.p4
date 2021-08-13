@@ -137,7 +137,7 @@ control engress_deparser(
     out empty_metadata_t clone_egress_to_egress_metadata,
     out empty_metadata_t recirculate_metadata,
     inout headers_t headers,
-    in local_metadata_t local_metadata,
+    in empty_metadata_t local_metadata,
     in psa_egress_output_metadata_t psa_egress_output_metadata,
     in psa_egress_deparser_input_metadata_t psa_egress_deparser_input_metadata
 )
@@ -148,7 +148,7 @@ control engress_deparser(
 
 control egress_processing
     inout headers_t headers,
-    inout local_metadata_t local_metadata,
+    inout empty_metadata_t local_metadata,
     in psa_egress_input_metadata_t psa_egress_input_metadata,
     inout psa_egress_output_metadata_t psa_egress_output_metadata
 )
