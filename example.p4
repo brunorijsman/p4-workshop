@@ -74,7 +74,7 @@ control ipv4_deparser(
 
 control verify_checksum(
     inout headers_t headers,
-    inout empty_metadata_t metadata
+    inout metadata_t metadata
 )
 {
     // Not implemented
