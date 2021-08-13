@@ -117,7 +117,7 @@ control ingress_processing(
     }
 }
 
-parser engress_parser(
+parser egress_parser(
     packet_in packet,
     out headers_t headers,
     inout empty_metadata_t local_metadata,
