@@ -48,17 +48,17 @@ parser ingress_parser(
 )
 {
     state start {
-        packet.extract(hd.ethernet);
-        transition select(hd.ethernet.ether_type) {
+        packet.extract(headers.ethernet);
+        transition select(headers.ethernet.ether_type) {
             0x0800:  parse_ipv4;
             default: accept;
         }
     }
 
     state parse_ipv4 {
-        packet.extract(hd.ipv4);
-        verify(hd.ipv4.version == 4w4, error.IPv4IncorrectVersion);
-        verify(hd.ipv4.ihl == 4w5, error.IPv4OptionsNotSupported);
+        packet.extract(headers.ipv4);
+        verify(headers.ipv4.version == 4w4, error.IPv4IncorrectVersion);
+        verify(headers.ipv4.ihl == 4w5, error.IPv4OptionsNotSupported);
         transition accept;
     }    
 }
