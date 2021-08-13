@@ -94,7 +94,7 @@ control ingress_processing(
         dropped = true;
     }
 
-    action to_port_action(bit<9> port) {
+    action to_port_action(bit<32> port) {
         headers.ipv4.ttl = headers.ipv4.ttl - 1;
         output_metadata.egress_port = port;
     }
