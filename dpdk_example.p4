@@ -89,12 +89,12 @@ control ingress_processing(
     bool dropped = false;
 
     action drop_action() {
-        output_metadata.egress_port = (PortId_t)4;  // TODO: Use a constant
+        output_metadata.egress_port = (PortId_t) 4;  // TODO: Use a constant
         // mark_to_drop(standard_metadata);   TODO: Can we use this????
         dropped = true;
     }
 
-    action to_port_action(bit<32> port) {
+    action to_port_action(PortId_t port) {
         headers.ipv4.ttl = headers.ipv4.ttl - 1;
         output_metadata.egress_port = port;
     }
