@@ -41,7 +41,7 @@ error {
 parser ingress_parser(
     packet_in packet,
     out headers_t headers,
-    inout local_metadata_t local_metadata,
+    inout empty_metadata_t local_metadata,
     in psa_ingress_parser_input_metadata_t standard_metadata,
     in empty_metadata_t resubmit_metadata,
     in empty_metadata_t recirculate_metadata
@@ -69,7 +69,7 @@ control ingress_deparser(
     out empty_metadata_t resubmit_metadata,
     out empty_metadata_t normal_metadata,
     inout headers_t headers,
-    in local_metadata_t local_metadata,
+    in empty_metadata_t local_metadata,
     in psa_ingress_output_metadata_t output_metadata
 )
 {
@@ -81,7 +81,7 @@ control ingress_deparser(
 
 control ingress_processing(
     inout headers_t headers,
-    inout local_metadata_t local_metadata,
+    inout empty_metadata_t local_metadata,
     in psa_ingress_input_metadata_t input_metadata,
     inout psa_ingress_output_metadata_t output_metadata
 )
@@ -120,7 +120,7 @@ control ingress_processing(
 parser engress_parser(
     packet_in packet,
     out headers_t headers,
-    inout local_metadata_t local_metadata,
+    inout empty_metadata_t local_metadata,
     in psa_egress_parser_input_metadata_t standard_metadata,
     in empty_metadata_t metadata,
     in empty_metadata_t clone_ingress_to_egress_metadata,
