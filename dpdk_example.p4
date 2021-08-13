@@ -132,7 +132,7 @@ parser engress_parser(
     }
 }
 
-control engress_deparser(
+control egress_deparser(
     packet_out packet,
     out empty_metadata_t clone_egress_to_egress_metadata,
     out empty_metadata_t recirculate_metadata,
