@@ -96,7 +96,7 @@ control ingress_processing(
 
     action to_port_action(bit<9> port) {
         headers.ipv4.ttl = headers.ipv4.ttl - 1;
-        standard_metadata.egress_port = port;
+        output_metadata.egress_port = port;
     }
 
     table ipv4_match {
